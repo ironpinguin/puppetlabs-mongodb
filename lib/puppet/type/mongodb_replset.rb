@@ -17,8 +17,9 @@ Puppet::Type.newtype(:mongodb_replset) do
     desc "The name of the replicaSet"
   end
 
-  newproperty(:members, :array_matching => :all) do
+  newparam(:members) do
     desc "The replicaSet members"
+    defaultto []
 
     def insync?(is)
       is.sort == should.sort

@@ -19,6 +19,11 @@ describe Puppet::Type.type(:mongodb_replset) do
     @replset[:members].should == ['mongo1:27017', 'mongo2:27017']
   end
 
+  it 'should accept a members hash' do
+    @replset[:members] = {'mongo1:27017' => {}, 'mongo2:27017' => {}}
+    @replset[:members].should == {'mongo1:27017' => {}, 'mongo2:27017' => {}}
+  end
+
   it 'should require a name' do
     expect {
       Puppet::Type.type(:mongodb_replset).new({})

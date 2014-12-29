@@ -7,7 +7,12 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:mongodb_replset).provider(:mongo) do
 
-  valid_members = ['mongo1:27017', 'mongo2:27017', 'mongo3:27017']
+  valid_members    = ['mongo1:27017', 'mongo2:27017', 'mongo3:27017']
+  expected_members =  { 
+    "mongo1:27017" => {:arbiterOnly=>false, :hidden=>false, :priority=>1, :slaveDelay=>0}, 
+    "mongo2:27017" => {:arbiterOnly=>false, :hidden=>false, :priority=>1, :slaveDelay=>0}, 
+    "mongo3:27017" => {:arbiterOnly=>false, :hidden=>false, :priority=>1, :slaveDelay=>0}
+  }
 
   let(:resource) { Puppet::Type.type(:mongodb_replset).new(
     { :ensure        => :present,
@@ -23,8 +28,8 @@ describe Puppet::Type.type(:mongodb_replset).provider(:mongo) do
   describe '#create' do
     it 'should create a replicaset' do
       provider.class.stubs(:get_replset_properties)
-      provider.stubs(:alive_members).returns(valid_members)
-      provider.expects('rs_initiate').with("{ _id: \"rs_test\", members: [ { _id: 0, host: \"mongo1:27017\" },{ _id: 1, host: \"mongo2:27017\" },{ _id: 2, host: \"mongo3:27017\" } ] }", "mongo1:27017").returns(
+      provider.stubs(:alive_members).returns(expected_members)
+      provider.expects('rs_initiate').with("{ _id: \"rs_test\", members: [ { _id: 0, host: \"mongo1:27017\", arbiterOnly: false, hidden: false, priority: 1, slaveDelay: 0},{ _id: 1, host: \"mongo2:27017\", arbiterOnly: false, hidden: false, priority: 1, slaveDelay: 0},{ _id: 2, host: \"mongo3:27017\", arbiterOnly: false, hidden: false, priority: 1, slaveDelay: 0} ] }", "mongo1:27017").returns(
         { "info" => "Config now saved locally.  Should come online in about a minute.",
           "ok"   => 1 } )
       provider.create
